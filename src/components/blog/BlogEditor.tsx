@@ -1,5 +1,8 @@
-import { useState, useEffect } from 'react';
-import { ArrowLeft, Save, Eye, Plus, Trash2, Settings } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { ArrowLeft, Save, Eye, Plus, Trash2, Settings, Upload, Image } from 'lucide-react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import './BlogEditor.css';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -22,6 +25,7 @@ export const BlogEditor = ({ post, onBack }: BlogEditorProps) => {
   const { categories, addBlogPost, updateBlogPost } = useBlogData();
   const { toast } = useToast();
   const [isPreview, setIsPreview] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form state
   const [title, setTitle] = useState(post?.title || '');
@@ -34,6 +38,25 @@ export const BlogEditor = ({ post, onBack }: BlogEditorProps) => {
   const [isPublished, setIsPublished] = useState(post?.isPublished || false);
   const [faqs, setFaqs] = useState<FAQ[]>(post?.faqs || []);
   const [tableOfContents, setTableOfContents] = useState<TableOfContentsItem[]>(post?.tableOfContents || []);
+  
+  // Image handling
+  const handleImageUpload = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target?.result as string;
+        // Insert image into content at cursor position
+        const imageTag = `<img src="${imageUrl}" alt="Uploaded image" style="max-width: 100%; height: auto;" />`;
+        setContent(content + '\n\n' + imageTag + '\n\n');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Calculate read time based on content
   const calculateReadTime = (text: string) => {
@@ -175,13 +198,13 @@ export const BlogEditor = ({ post, onBack }: BlogEditorProps) => {
         </Card>
       )}
 
-      <Card className="mb-8 bg-gradient-card border-border/50">
-        <CardContent className="pt-6">
-          <div className="prose prose-invert max-w-none">
-            <pre className="whitespace-pre-wrap text-foreground">{content}</pre>
-          </div>
-        </CardContent>
-      </Card>
+        <Card className="mb-8 bg-gradient-card border-border/50">
+          <CardContent className="pt-6">
+            <div className="prose max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-em:text-foreground prose-blockquote:text-muted-foreground prose-code:text-foreground prose-pre:bg-muted prose-pre:text-foreground prose-ol:text-foreground prose-ul:text-foreground prose-li:text-foreground prose-a:text-primary hover:prose-a:text-primary/80">
+              <div dangerouslySetInnerHTML={{ __html: content }} />
+            </div>
+          </CardContent>
+        </Card>
 
       {faqs.length > 0 && (
         <Card className="bg-gradient-card border-border/50">
@@ -237,13 +260,47 @@ export const BlogEditor = ({ post, onBack }: BlogEditorProps) => {
             </div>
 
             <div>
-              <Label htmlFor="content">Content</Label>
-              <Textarea
-                id="content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Write your blog post content here..."
-                className="mt-1 min-h-[400px] bg-card/50"
+              <div className="flex items-center justify-between mb-2">
+                <Label htmlFor="content">Content</Label>
+                <Button 
+                  type="button"
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleImageUpload}
+                  className="gap-1"
+                >
+                  <Image className="w-4 h-4" />
+                  Add Image
+                </Button>
+              </div>
+              <div className="border rounded-lg bg-card/50">
+                <ReactQuill
+                  value={content}
+                  onChange={setContent}
+                  placeholder="Write your blog post content here..."
+                  modules={{
+                    toolbar: [
+                      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                      ['bold', 'italic', 'underline', 'strike'],
+                      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                      [{ 'script': 'sub'}, { 'script': 'super' }],
+                      [{ 'indent': '-1'}, { 'indent': '+1' }],
+                      [{ 'direction': 'rtl' }],
+                      [{ 'color': [] }, { 'background': [] }],
+                      [{ 'align': [] }],
+                      ['link', 'image', 'video'],
+                      ['clean']
+                    ],
+                  }}
+                  style={{ minHeight: '400px' }}
+                />
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
               />
             </div>
           </CardContent>
