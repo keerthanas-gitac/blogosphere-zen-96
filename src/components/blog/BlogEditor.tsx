@@ -280,18 +280,27 @@ export const BlogEditor = ({ post, onBack }: BlogEditorProps) => {
                   placeholder="Write your blog post content here..."
                   modules={{
                     toolbar: [
-                      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                      [{ 'header': [1, 2, 3, 4, false] }],
+                      [{ 'size': ['small', false, 'large', 'huge'] }],
                       ['bold', 'italic', 'underline', 'strike'],
+                      [{ 'color': [] }, { 'background': [] }],
                       [{ 'list': 'ordered'}, { 'list': 'bullet' }],
                       [{ 'script': 'sub'}, { 'script': 'super' }],
                       [{ 'indent': '-1'}, { 'indent': '+1' }],
-                      [{ 'direction': 'rtl' }],
-                      [{ 'color': [] }, { 'background': [] }],
                       [{ 'align': [] }],
+                      ['blockquote', 'code-block'],
                       ['link', 'image', 'video'],
                       ['clean']
                     ],
                   }}
+                  formats={[
+                    'header', 'font', 'size',
+                    'bold', 'italic', 'underline', 'strike', 'blockquote',
+                    'list', 'bullet', 'indent',
+                    'link', 'image', 'video',
+                    'align', 'color', 'background',
+                    'script', 'code-block'
+                  ]}
                   style={{ minHeight: '400px' }}
                 />
               </div>
