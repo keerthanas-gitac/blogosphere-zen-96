@@ -161,7 +161,6 @@ export const BlogEditor = ({ post, onBack }: BlogEditorProps) => {
   const renderPreview = () => (
     <div className="max-w-4xl mx-auto">
       <div className="mb-8">
-        <Badge className="mb-4 bg-primary/20 text-primary">{category}</Badge>
         <h1 className="text-4xl font-bold mb-4 bg-gradient-primary bg-clip-text text-transparent">
           {title}
         </h1>
@@ -390,22 +389,6 @@ export const BlogEditor = ({ post, onBack }: BlogEditorProps) => {
                 placeholder="Author name"
                 className="mt-1 bg-card/50"
               />
-            </div>
-
-            <div>
-              <Label htmlFor="category">Category</Label>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger className="mt-1 bg-card/50">
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.name}>
-                      {cat.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
 
             <div>
