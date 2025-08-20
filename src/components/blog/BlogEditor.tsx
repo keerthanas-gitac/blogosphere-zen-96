@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Save, Eye, Plus, Trash2, Settings, Upload, Image } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ArrowLeft, Save, Eye, Plus, Trash2, Settings } from 'lucide-react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import './BlogEditor.css';
@@ -25,8 +25,6 @@ export const BlogEditor = ({ post, onBack }: BlogEditorProps) => {
   const { categories, addBlogPost, updateBlogPost } = useBlogData();
   const { toast } = useToast();
   const [isPreview, setIsPreview] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   // Form state
   const [title, setTitle] = useState(post?.title || '');
   const [content, setContent] = useState(post?.content || '');
@@ -38,26 +36,6 @@ export const BlogEditor = ({ post, onBack }: BlogEditorProps) => {
   const [isPublished, setIsPublished] = useState(post?.isPublished || false);
   const [faqs, setFaqs] = useState<FAQ[]>(post?.faqs || []);
   const [tableOfContents, setTableOfContents] = useState<TableOfContentsItem[]>(post?.tableOfContents || []);
-  
-  // Image handling
-  const handleImageUpload = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageUrl = e.target?.result as string;
-        // Insert image into content at cursor position
-        const imageTag = `<img src="${imageUrl}" alt="Uploaded image" style="max-width: 100%; height: auto;" />`;
-        setContent(content + '\n\n' + imageTag + '\n\n');
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   // Calculate read time based on content
   const calculateReadTime = (text: string) => {
     const wordsPerMinute = 200;
@@ -259,20 +237,8 @@ export const BlogEditor = ({ post, onBack }: BlogEditorProps) => {
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <Label htmlFor="content">Content</Label>
-                <Button 
-                  type="button"
-                  variant="outline" 
-                  size="sm" 
-                  onClick={handleImageUpload}
-                  className="gap-1"
-                >
-                  <Image className="w-4 h-4" />
-                  Add Image
-                </Button>
-              </div>
-              <div className="border rounded-lg bg-card/50">
+              <Label htmlFor="content">Content</Label>
+              <div className="border rounded-lg bg-card/50 mt-2">
                 <ReactQuill
                   value={content}
                   onChange={setContent}
@@ -303,13 +269,6 @@ export const BlogEditor = ({ post, onBack }: BlogEditorProps) => {
                   style={{ minHeight: '400px' }}
                 />
               </div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="hidden"
-              />
             </div>
           </CardContent>
         </Card>
